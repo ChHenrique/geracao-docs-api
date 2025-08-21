@@ -1,0 +1,141 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Flow {
+  DRAW
+  REVIEW
+  ACCEPT
+  SIGN
+  PUBLISH
+}
+
+
+enum Actions {
+  CREATED_DOCUMENT
+  UPDATED_DOCUMENT
+  DELETED_DOCUMENT
+  APPROVED_DOCUMENT
+  REVIEWED_DOCUMENT
+  SIGNED_DOCUMENT
+  PUBLISHED_DOCUMENT
+}
+
+enum PermissionsName {
+  CREATE_DOCUMENT
+  READ_DOCUMENT
+  UPDATE_DOCUMENT
+  DELETE_DOCUMENT
+  MANAGE_USERS
+  MANAGE_ROLES
+  MANAGE_TEMPLATES
+  APPROVE_DOCUMENT
+  REVIEW_DOCUMENT
+  SIGN_DOCUMENT
+  PUBLISH_DOCUMENT
+}
+
+model Role {
+  id          String           @id @default(uuid())
+  name        String           @unique
+  users       User[]
+  permissions RolePermission[]
+}
+
+model Permission {
+  id    String           @id @default(uuid())
+  name  PermissionsName   @unique
+  roles RolePermission[]
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id])
+  permission   Permission @relation(fields: [permissionId], references: [id])
+
+  @@id([roleId, permissionId])
+}
+
+model User {
+  id        String     @id @unique @default(uuid())
+  cpf       String     @unique
+  cnpj      String?    @unique
+  email     String     @unique
+  name      String
+  lastname  String
+  password  String
+  roleId    String
+  role      Role       @relation(fields: [roleId], references: [id])
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  AuditLog  AuditLog[]
+  templates Template[]
+}
+
+model Template {
+  id           String             @id @unique @default(uuid())
+  name         String
+  conteudoHTML String
+  createdById  String
+  createdBy    User               @relation(fields: [createdById], references: [id])
+  variables    VariableTemplate[]
+  documents    Document[]
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+}
+
+model VariableTemplate {
+  id                 String             @id @unique @default(uuid())
+  name               String
+  templateId         String
+  template           Template           @relation(fields: [templateId], references: [id])
+  variaveisDocumento VariableDocument[]
+}
+
+model Document {
+  id         String             @id @unique @default(uuid())
+  title      String
+  urlPdf     String
+  templateId String
+  template   Template           @relation(fields: [templateId], references: [id])
+  workFlowId String
+  workFlow   WorkFlow           @relation(fields: [workFlowId], references: [id])
+  variables  VariableDocument[]
+  auditLogs  AuditLog[]
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+}
+
+model VariableDocument {
+  id            String           @id @unique @default(uuid())
+  name          String
+  value         String
+  documentId    String
+  document      Document         @relation(fields: [documentId], references: [id])
+  templateVarId String
+  templateVar   VariableTemplate @relation(fields: [templateVarId], references: [id])
+}
+
+model WorkFlow {
+  id          String     @id @unique @default(uuid())
+  status      Flow
+  description String
+  documents   Document[]
+  createdAt   DateTime   @default(now())
+}
+
+model AuditLog {
+  id         String   @id @unique @default(uuid())
+  action     Actions
+  userId     String
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+  date       DateTime @default(now())
+}
