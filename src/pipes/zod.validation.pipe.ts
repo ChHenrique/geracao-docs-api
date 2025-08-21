@@ -1,4 +1,4 @@
-import { ArgumentMetadata, BadRequestException, ForbiddenException, HttpException, HttpStatus, PayloadTooLargeException, PipeTransform } from "@nestjs/common";
+import { ArgumentMetadata, BadRequestException, PipeTransform } from "@nestjs/common";
 import { ZodType } from "zod";
 import { AnyZodObject } from "zod/v3";
 
@@ -10,7 +10,7 @@ export class ZodValiditionPipe implements PipeTransform {
     // Método que vem do pipeTransform
     transform(value: any, metadata: ArgumentMetadata) {
         try {
-            // Valido qualquer tipo de dado que vim do zod, com claro o tipo que eu mandei
+            // Valida qualquer tipo de dado que vim do zod, com claro o tipo que eu mandei
             const parsedValue = this.schema.parse(value);
             return parsedValue
         } catch {
