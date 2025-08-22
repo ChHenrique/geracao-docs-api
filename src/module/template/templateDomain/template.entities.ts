@@ -1,25 +1,15 @@
 import z from "zod"
 
-/* model Template {
-  id           String             @id @unique @default(uuid())
-  name         String
-  contentHTML String
-  createdById  String
-  createdBy    User               @relation(fields: [createdById], references: [id])
-  variables    VariableTemplate[]
-  documents    Document[]
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
-} */
-
 export const templateSchema = z.object({
     name: z.string().min(1).max(255),
-    contentHTML: z.string().min(1).max(255),
+    contentHTML: z.string().min(1),
 })
 
-export class TemplateEntitie {
+export class TemplateEntity {
     constructor(
+       public readonly id: string,
        public name: string,
-       public contentHTML: string
+       public contentHTML: string,
+       public createdById: string
     ){}
 }
