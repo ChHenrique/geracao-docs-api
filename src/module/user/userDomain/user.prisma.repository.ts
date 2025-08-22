@@ -1,5 +1,4 @@
 import { UserEntitie } from "./user.entities";
-
 import { prisma } from "src/config/prisma.config";
 import { IUserRepository } from "./user.repository";
 
@@ -8,7 +7,6 @@ export class UserPrismaRepository implements IUserRepository {
         const user = await prisma.user.create({
             data
         });
-
         return user;
     }
 
@@ -17,7 +15,6 @@ export class UserPrismaRepository implements IUserRepository {
             where: { id },
             data
         });
-
         return updatedUser;
     }
 
@@ -31,24 +28,62 @@ export class UserPrismaRepository implements IUserRepository {
         const user = await prisma.user.findUnique({
             where: { id },
             include: {
-                role: true,
+                role: {
+                    include: {
+                        permissions: true
+                    }
+                },
                 AuditLog: true,
                 templates: true
             }
         });
-
         return user;
     }
 
     async getAll(): Promise<UserEntitie[] | null> {
-        const user = await prisma.user.findMany({
+        const users = await prisma.user.findMany({
             include: {
                 role: true,
                 AuditLog: true,
                 templates: true
             }
         });
+        return users;
+    }
 
+    async getByEmail(email: string): Promise<UserEntitie | null> {
+        const user = await prisma.user.findUnique({
+            where: { email },
+            include: {
+                role: true,
+                AuditLog: true,
+                templates: true
+            }
+        });
+        return user;
+    }
+
+    async getByCPF(cpf: string): Promise<UserEntitie | null> {
+        const user = await prisma.user.findUnique({
+            where: { cpf },
+            include: {
+                role: true,
+                AuditLog: true,
+                templates: true
+            }
+        });
+        return user;
+    }
+
+    async getByCNPJ(cnpj: string): Promise<UserEntitie | null> {
+        const user = await prisma.user.findUnique({
+            where: { cnpj },
+            include: {
+                role: true,
+                AuditLog: true,
+                templates: true
+            }
+        });
         return user;
     }
 }

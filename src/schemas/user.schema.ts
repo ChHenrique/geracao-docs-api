@@ -7,4 +7,15 @@ export const userSchema = z.object({
     email: z.email(),
     cpf: z.string().length(11),
     cnpj: z.string().length(14),
+    role: z.string()
 })
+
+export const userSchemaLogin = z.object({
+    email: z.email().optional(),
+    cpf: z.string().length(11).optional(),
+    cnpj: z.string().length(14).optional(),
+    password: z.string().min(8)
+})
+
+export type userSchemaLoginDTO = z.infer<typeof userSchemaLogin>
+export type userSchemaDTO = z.infer<typeof userSchema>
