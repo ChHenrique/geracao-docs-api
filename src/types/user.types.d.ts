@@ -1,8 +1,8 @@
-import 'express'
-import { IUserJWT } from 'src/interfaces/user.interface'
+import 'express';
+import { IUserJWT } from 'src/interfaces/user.interface';
 
 declare module 'express' {
-    interface Request {
-        user: IUserJWT
-    }
+  interface Request {
+    user: IUserJWT;
+  }
 }

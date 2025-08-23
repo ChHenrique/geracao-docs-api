@@ -1,4 +1,4 @@
-import z from "zod"
+import z from 'zod';
 
 /* model Template {
   id           String             @id @unique @default(uuid())
@@ -13,13 +13,13 @@ import z from "zod"
 } */
 
 export const templateSchema = z.object({
-    name: z.string().min(1).max(255),
-    contentHTML: z.string().min(1).max(255),
-})
+  name: z.string().min(1).max(255),
+  contentHTML: z.string().min(1).max(255),
+});
 
 export class TemplateEntitie {
-    constructor(
-       public name: string,
-       public contentHTML: string
-    ){}
+  constructor(
+    public name: string,
+    public contentHTML: string,
+  ) {}
 }
