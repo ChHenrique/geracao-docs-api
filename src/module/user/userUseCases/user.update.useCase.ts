@@ -1,9 +1,6 @@
 import type { IRoleRepository } from 'src/module/role/roleDomain/role.repository';
 import type { IUserRepository } from '../userDomain/user.repository';
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { userSchemaUpdateDTO } from 'src/schemas/user.schema';
 import { isUniqueUpdate } from 'src/utils/isUnique';
 import { Request } from 'express';

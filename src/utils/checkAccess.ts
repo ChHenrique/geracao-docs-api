@@ -9,7 +9,7 @@ export async function checkAccess(req: Request, getUserById: Function) {
   const user = req.user;
   if (!user) throw new UnauthorizedException('Unauthorized');
 
-  const { id } = req.params as { id: string }
+  const { id } = req.params as { id: string };
 
   const permission = user.permissions.includes('MANAGE_USERS');
   const isSelfDelete = !id || id === user.id;

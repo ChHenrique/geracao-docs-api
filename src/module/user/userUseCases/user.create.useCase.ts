@@ -1,10 +1,6 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import type { IUserRepository } from '../userDomain/user.repository';
-import { userSchema, userSchemaDTO } from 'src/schemas/user.schema';
+import { userSchemaDTO } from 'src/schemas/user.schema';
 import { isUnique } from 'src/utils/isUnique';
 import bcrypt from 'bcrypt';
 import { UserEntitie } from '../userDomain/user.entities';

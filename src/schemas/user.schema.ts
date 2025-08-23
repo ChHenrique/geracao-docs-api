@@ -27,7 +27,6 @@ export const userSchemaLogin = z.object({
   password: z.string().min(8),
 });
 
-
 export type userSchemaLoginDTO = z.infer<typeof userSchemaLogin>;
 export type userSchemaDTO = z.infer<typeof userSchema>;
-export type userSchemaUpdateDTO = z.infer<typeof userSchemaUpdate>
+export type userSchemaUpdateDTO = z.infer<typeof userSchemaUpdate>;

@@ -31,7 +31,7 @@ import { UserGetAllUseCase } from '../userUseCases/user.getAll.useCase';
 import { UserloginUseCase } from '../userUseCases/user.login.useCase';
 
 @Injectable()
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(
     private createUseCase: UserCreateUseCase,
@@ -82,7 +82,7 @@ export class UserController {
     res.status(200).send({ Message: 'Users found', users: users });
   }
 
-  @Post()
+  @Post('/login')
   @UsePipes(new ZodValiditionPipe(userSchemaLogin))
   async login(@Body() data: userSchemaLoginDTO, @Res() res: Response) {
     await this.loginUseCase.execute(data);
