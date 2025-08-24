@@ -6,9 +6,10 @@ import {
 } from '@nestjs/common';
 import { UserModule } from './module/user/user.module';
 import { AuthMiddleware } from './middlewares/auth.middleware';
+import { RoleModule } from './module/role/role.module';
 
 @Module({
-  imports: [UserModule],
+  imports: [UserModule, RoleModule],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

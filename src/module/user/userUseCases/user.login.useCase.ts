@@ -1,35 +1,33 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import type { IUserRepository } from '../userDomain/user.repository';
 import { userSchema, userSchemaLoginDTO } from 'src/schemas/user.schema';
-import { decryptCPF } from 'src/utils/decryptedCPF';
-import { decryptCNPJ } from 'src/utils/decryptedCNPJ';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { env } from 'process';
 import { payloadJWT } from 'src/utils/payloadJwt';
+import { encryptCPF } from 'src/utils/encryptCPF';
+import { encryptCNPJ } from 'src/utils/encryptCNPJ';
 
 @Injectable()
 export class UserloginUseCase {
-  constructor(private repo: IUserRepository) {}
+  constructor(@Inject('IUserRepository') private userRepo: IUserRepository) {}
 
   async execute(data: userSchemaLoginDTO) {
     let user: any;
 
-    const parsedData = userSchema.safeParse(data);
-    if (!parsedData.success) throw new BadRequestException('Bad Request');
-
     if (data.cpf) {
-      const decryptedCPF = decryptCPF(data.cpf);
-      user = this.repo.getByCPF(decryptedCPF);
+      const encryptedCPF = encryptCPF(data.cpf);
+      user = this.userRepo.getByCPF(encryptedCPF);
     } else if (data.cnpj) {
-      const decryptedCNPJ = decryptCNPJ(data.cnpj);
-      user = this.repo.getByCNPJ(decryptedCNPJ);
+      const encryptedCNPJ = encryptCNPJ(data.cnpj);
+      user = this.userRepo.getByCNPJ(encryptedCNPJ);
     } else if (data.email) {
-      user = this.repo.getByEmail(data.email);
+      user = this.userRepo.getByEmail(data.email);
     }
 
     if (!user) throw new NotFoundException('Credentials invalid');
@@ -38,6 +36,8 @@ export class UserloginUseCase {
     if (!isPassword) throw new NotFoundException('Credentials invalid');
 
     const payload = payloadJWT(user);
-    jwt.sign(payload, env.JWT_SECRET);
+    const token = jwt.sign(payload, env.JWT_SECRET);
+
+    return token;
   }
 }

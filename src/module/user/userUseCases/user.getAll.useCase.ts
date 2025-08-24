@@ -1,11 +1,12 @@
-import { NotFoundException } from '@nestjs/common';
-import { IUserRepository } from '../userDomain/user.repository';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import type { IUserRepository } from '../userDomain/user.repository';
 
+@Injectable()
 export class UserGetAllUseCase {
-  constructor(private repo: IUserRepository) {}
+  constructor(@Inject('IUserRepository') private userRepo: IUserRepository) {}
 
   async execute() {
-    const users = await this.repo.getAll();
+    const users = await this.userRepo.getAll();
     if (!users || users.length <= 0)
       throw new NotFoundException('No users were registered');
 

@@ -1,4 +1,7 @@
-import z from 'zod';
+import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi'
+import z from 'zod'
+
+extendZodWithOpenApi(z)
 
 export const userSchema = z.object({
   name: z.string().min(1).max(255),
@@ -8,7 +11,7 @@ export const userSchema = z.object({
   cpf: z.string().length(11),
   cnpj: z.string().length(14),
   role: z.string(),
-});
+}).openapi("User Schema")
 
 export const userSchemaUpdate = z.object({
   name: z.string().min(1).max(255).optional(),
@@ -18,14 +21,14 @@ export const userSchemaUpdate = z.object({
   cpf: z.string().length(11).optional(),
   cnpj: z.string().length(14).optional(),
   role: z.string().optional(),
-});
+}).openapi("User Schema Update")
 
 export const userSchemaLogin = z.object({
   email: z.email().optional(),
   cpf: z.string().length(11).optional(),
   cnpj: z.string().length(14).optional(),
   password: z.string().min(8),
-});
+}).openapi("User Schema login")
 
 export type userSchemaLoginDTO = z.infer<typeof userSchemaLogin>;
 export type userSchemaDTO = z.infer<typeof userSchema>;

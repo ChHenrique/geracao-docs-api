@@ -29,7 +29,9 @@ import { UserDeleteUseCase } from '../userUseCases/user.delete.useCase';
 import { UserGetUniqueUseCase } from '../userUseCases/user.getUnique.useCase';
 import { UserGetAllUseCase } from '../userUseCases/user.getAll.useCase';
 import { UserloginUseCase } from '../userUseCases/user.login.useCase';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Users')
 @Injectable()
 @Controller('users')
 export class UserController {
@@ -51,7 +53,7 @@ export class UserController {
     res.status(201).send({ Message: 'User Created', data: userCreated });
   }
 
-  @Put()
+  @Put(':id')
   @UsePipes(new ZodValiditionPipe(userSchemaUpdate))
   async update(
     @Body() data: userSchemaUpdateDTO,
@@ -85,7 +87,13 @@ export class UserController {
   @Post('/login')
   @UsePipes(new ZodValiditionPipe(userSchemaLogin))
   async login(@Body() data: userSchemaLoginDTO, @Res() res: Response) {
-    await this.loginUseCase.execute(data);
-    res.status(200).send({ Message: 'Logado com sucesso!' });
+    const token = await this.loginUseCase.execute(data);
+    res
+      .cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+      })
+      .send({ Message: 'Login successful' });
   }
 }

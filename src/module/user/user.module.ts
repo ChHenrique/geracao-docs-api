@@ -13,7 +13,6 @@ import { UserGetAllUseCase } from './userUseCases/user.getAll.useCase';
 import { UserGetUniqueUseCase } from './userUseCases/user.getUnique.useCase';
 import { UserPrismaRepository } from './userDomain/user.prisma.repository';
 import { IRolePrismaRepository } from '../role/roleDomain/role.prisma.repository';
-import { AuthMiddleware } from 'src/middlewares/auth.middleware';
 
 @Module({
   controllers: [UserController],
@@ -45,12 +44,4 @@ import { AuthMiddleware } from 'src/middlewares/auth.middleware';
     UserGetUniqueUseCase,
   ],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(AuthMiddleware)
-      .exclude({ path: 'users/login', method: RequestMethod.POST })
-      .forRoutes('users');
-  }
-}
 export class UserModule {}
