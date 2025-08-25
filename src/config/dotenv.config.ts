@@ -5,4 +5,5 @@ export const env = {
   DATABASE_URL: process.env.DATABASE_URL as string,
   AES_KEY: process.env.AES_KEY as string,
   JWT_SECRET: process.env.JWT_SECRET as string,
+  IV_KEY: process.env.IV_KEY as string
 };

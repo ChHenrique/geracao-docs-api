@@ -16,7 +16,7 @@ export class ZodValiditionPipe implements PipeTransform {
     try {
       // Valida qualquer tipo de dado que vim do zod, com claro o tipo que eu mandei
       const parsedValue = this.schema.safeParse(value);
-      return parsedValue;
+      return parsedValue.data;
     } catch {
       // Erro de bad request
       throw new BadRequestException('Bad Request');

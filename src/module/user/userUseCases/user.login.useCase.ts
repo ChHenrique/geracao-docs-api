@@ -12,6 +12,7 @@ import { env } from 'process';
 import { payloadJWT } from 'src/utils/payloadJwt';
 import { encryptCPF } from 'src/utils/encryptCPF';
 import { encryptCNPJ } from 'src/utils/encryptCNPJ';
+import { prisma } from 'src/config/prisma.config';
 
 @Injectable()
 export class UserloginUseCase {
@@ -21,22 +22,24 @@ export class UserloginUseCase {
     let user: any;
 
     if (data.cpf) {
-      const encryptedCPF = encryptCPF(data.cpf);
-      user = this.userRepo.getByCPF(encryptedCPF);
+      const encryptedCPF = encryptCPF(data.cpf)
+      user = await this.userRepo.getByCPF(encryptedCPF)
     } else if (data.cnpj) {
-      const encryptedCNPJ = encryptCNPJ(data.cnpj);
-      user = this.userRepo.getByCNPJ(encryptedCNPJ);
+      const encryptedCNPJ = encryptCNPJ(data.cnpj)
+      user = await this.userRepo.getByCNPJ(encryptedCNPJ)
     } else if (data.email) {
-      user = this.userRepo.getByEmail(data.email);
+      user = await this.userRepo.getByEmail(data.email)
     }
 
-    if (!user) throw new NotFoundException('Credentials invalid');
+    if (!user) throw new NotFoundException('Credentials invalid')
 
-    const isPassword = await bcrypt.compare(user.password, data.password);
+    const isPassword = await bcrypt.compare(data.password, user.password)
     if (!isPassword) throw new NotFoundException('Credentials invalid');
+    
+    const permissions = user.role.permissions.map(rp => rp.permission);
+    const payload = payloadJWT({ ...user, role: { ...user.role, permissions } });
 
-    const payload = payloadJWT(user);
-    const token = jwt.sign(payload, env.JWT_SECRET);
+    const token = jwt.sign(payload, env.JWT_SECRET)
 
     return token;
   }

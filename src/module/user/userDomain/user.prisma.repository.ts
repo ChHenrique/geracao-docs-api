@@ -11,9 +11,19 @@ export class UserPrismaRepository implements IUserRepository {
   }
 
   async update(id: string, data: UserEntitie): Promise<UserEntitie | null> {
+     const { name, lastname, email, cpf, cnpj, password, roleId } = data;
+
     const updatedUser = await prisma.user.update({
       where: { id },
-      data,
+      data:  {
+      name,
+      lastname,
+      email,
+      cpf,
+      cnpj,
+      password,
+      ...(roleId && { roleId }), 
+    },
     });
     return updatedUser;
   }
@@ -24,23 +34,25 @@ export class UserPrismaRepository implements IUserRepository {
     });
   }
 
-  async getById(id: string): Promise<UserEntitie | null> {
+  async getById(id: string) {
     const user = await prisma.user.findUnique({
       where: { id },
       include: {
         role: {
           include: {
-            permissions: true,
+            permissions: { include: { permission: true }},
           },
         },
         AuditLog: true,
         templates: true,
       },
     });
+
+
     return user;
   }
 
-  async getAll(): Promise<UserEntitie[] | null> {
+  async getAll(){
     const users = await prisma.user.findMany({
       include: {
         role: true,
@@ -55,7 +67,11 @@ export class UserPrismaRepository implements IUserRepository {
     const user = await prisma.user.findUnique({
       where: { email },
       include: {
-        role: true,
+        role: {
+          include: {
+            permissions: { include: { permission: true }}
+          }
+        },
         AuditLog: true,
         templates: true,
       },
@@ -67,7 +83,11 @@ export class UserPrismaRepository implements IUserRepository {
     const user = await prisma.user.findUnique({
       where: { cpf },
       include: {
-        role: true,
+        role: {
+          include: {
+            permissions: { include: { permission: true } }
+          }
+        },
         AuditLog: true,
         templates: true,
       },
@@ -79,7 +99,11 @@ export class UserPrismaRepository implements IUserRepository {
     const user = await prisma.user.findUnique({
       where: { cnpj },
       include: {
-        role: true,
+         role: {
+          include: {
+            permissions: { include: { permission: true } }
+          }
+        },
         AuditLog: true,
         templates: true,
       },

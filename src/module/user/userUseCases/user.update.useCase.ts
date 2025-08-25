@@ -28,9 +28,11 @@ export class UserUpdateUseCase {
     }
 
     await isUniqueUpdate(this.userRepo, data, userExist);
-    updateFields(userExist, data);
+
+    updateFields(userExist, data)
+    const { roleId, ...rest } = userExist
 
     await encryptUserData(data, userExist);
-    await this.userRepo.update(user.id, userExist);
+    await this.userRepo.update(user.id, rest);
   }
 }

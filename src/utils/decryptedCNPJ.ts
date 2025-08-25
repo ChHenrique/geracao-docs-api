@@ -1,10 +1,9 @@
 import { createDecipheriv } from 'node:crypto';
-import { algorithm, key } from './encryptCPF';
+import { algorithm, iv, key } from './encryptCPF';
 
 export function decryptCNPJ(encrypted: string) {
   const [ivHex, encrypterHex] = encrypted.split(':');
 
-  const iv = Buffer.from(ivHex, 'hex');
   const encryptedText = Buffer.from(encrypterHex, 'hex');
 
   const dechiper = createDecipheriv(algorithm, key, iv);

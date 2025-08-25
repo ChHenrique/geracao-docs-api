@@ -16,6 +16,6 @@ export class AppModule implements NestModule {
     consumer
       .apply(AuthMiddleware)
       .exclude({ path: 'users/login', method: RequestMethod.POST })
-      .forRoutes('users');
+      .forRoutes('users', 'roles');
   }
 }
