@@ -6,7 +6,7 @@ import { prisma } from "src/config/prisma.config";
 
 export class TemplatePrismaRepository implements ITemplateRepository {
 
-    // get unique aceita id ou nome
+    // get unique aceita como parâmetro qualquer campo único
     async getUnique(whereUniqueInput: Prisma.TemplateWhereUniqueInput): Promise<TemplateEntity | null> {
         const template = await prisma.template.findUnique({
             where: whereUniqueInput,
