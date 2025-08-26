@@ -12,35 +12,42 @@ import { env } from 'process';
 import { payloadJWT } from 'src/utils/payloadJwt';
 import { encryptCPF } from 'src/utils/encryptCPF';
 import { encryptCNPJ } from 'src/utils/encryptCNPJ';
-import { prisma } from 'src/config/prisma.config';
+import { Request } from 'express';
 
 @Injectable()
 export class UserloginUseCase {
-  constructor(@Inject('IUserRepository') private userRepo: IUserRepository) {}
+  constructor(@Inject('IUserRepository') private userRepo: IUserRepository) { }
 
-  async execute(data: userSchemaLoginDTO) {
+  private async getUserData(data: userSchemaLoginDTO) {
+    if (data.cpf) return this.userRepo.getByCPF(encryptCPF(data.cpf));
+    if (data.cnpj) return this.userRepo.getByCNPJ(encryptCNPJ(data.cnpj));
+    if (data.email) return this.userRepo.getByEmail(data.email);
+    return null;
+  }
+
+  private async tokenGenerate(user: any) {
+    const permissions = user.role.permissions.map(rp => rp.permission);
+    const payload = payloadJWT({ ...user, role: { ...user.role, permissions } });
+
+    return jwt.sign(payload, env.JWT_SECRET)
+  }
+
+  async execute(data: userSchemaLoginDTO, req: Request) {
     let user: any;
 
-    if (data.cpf) {
-      const encryptedCPF = encryptCPF(data.cpf)
-      user = await this.userRepo.getByCPF(encryptedCPF)
-    } else if (data.cnpj) {
-      const encryptedCNPJ = encryptCNPJ(data.cnpj)
-      user = await this.userRepo.getByCNPJ(encryptedCNPJ)
-    } else if (data.email) {
-      user = await this.userRepo.getByEmail(data.email)
+    if (req.user) {
+      user = await this.userRepo.getById(req.user.id)
+      if (!user) throw new NotFoundException('User not found')
+      return this.tokenGenerate(user);
     }
 
+    user = await this.getUserData(user)
     if (!user) throw new NotFoundException('Credentials invalid')
 
     const isPassword = await bcrypt.compare(data.password, user.password)
     if (!isPassword) throw new NotFoundException('Credentials invalid');
-    
-    const permissions = user.role.permissions.map(rp => rp.permission);
-    const payload = payloadJWT({ ...user, role: { ...user.role, permissions } });
 
-    const token = jwt.sign(payload, env.JWT_SECRET)
 
-    return token;
+    return this.tokenGenerate(user);
   }
 }
