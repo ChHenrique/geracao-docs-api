@@ -18,13 +18,6 @@ import { Request } from 'express';
 export class UserloginUseCase {
   constructor(@Inject('IUserRepository') private userRepo: IUserRepository) { }
 
-  private async getUserData(data: userSchemaLoginDTO) {
-    if (data.cpf) return this.userRepo.getByCPF(encryptCPF(data.cpf));
-    if (data.cnpj) return this.userRepo.getByCNPJ(encryptCNPJ(data.cnpj));
-    if (data.email) return this.userRepo.getByEmail(data.email);
-    return null;
-  }
-
   private async tokenGenerate(user: any) {
     const permissions = user.role.permissions.map(rp => rp.permission);
     const payload = payloadJWT({ ...user, role: { ...user.role, permissions } });
@@ -38,10 +31,19 @@ export class UserloginUseCase {
     if (req.user) {
       user = await this.userRepo.getById(req.user.id)
       if (!user) throw new NotFoundException('User not found')
-      return this.tokenGenerate(user);
+      return this.tokenGenerate(user)
     }
 
-    user = await this.getUserData(user)
+    if (data.cpf) {
+      const encryptedCPF = encryptCPF(data.cpf)
+      user = await this.userRepo.getByCPF(encryptedCPF)
+    } else if (data.cnpj) {
+      const encryptedCNPJ = encryptCNPJ(data.cnpj)
+      user = await this.userRepo.getByCNPJ(encryptedCNPJ)
+    } else if (data.email) {
+      user = await this.userRepo.getByEmail(data.email)
+    }
+
     if (!user) throw new NotFoundException('Credentials invalid')
 
     const isPassword = await bcrypt.compare(data.password, user.password)
