@@ -14,10 +14,10 @@ export class UserUpdateUseCase {
   constructor(
     @Inject('IUserRepository') private userRepo: IUserRepository,
     @Inject('IRoleRepository') private roleRepo: IRoleRepository,
-  ) {}
+  ) { }
 
-  async execute(data: userSchemaUpdateDTO, req: Request) {
-    const user: User = await checkAccess(req, this.userRepo.getById);
+  async execute(data: userSchemaUpdateDTO, req: Request, id: string) {
+    const user: User = await checkAccess(req, this.userRepo.getById, id);
 
     const userExist = await this.userRepo.getById(user.id);
     if (!userExist) throw new NotFoundException('This user does not exist');
@@ -28,11 +28,11 @@ export class UserUpdateUseCase {
     }
 
     await isUniqueUpdate(this.userRepo, data, userExist);
-
-    updateFields(userExist, data)
-    const { roleId, ...rest } = userExist
+    updateFields(userExist, data);
 
     await encryptUserData(data, userExist);
-    await this.userRepo.update(user.id, rest);
+    await this.userRepo.update(user.id, userExist);
+
+    return
   }
 }

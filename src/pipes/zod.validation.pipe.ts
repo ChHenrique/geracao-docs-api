@@ -2,6 +2,7 @@ import {
   ArgumentMetadata,
   BadRequestException,
   PipeTransform,
+  UnsupportedMediaTypeException,
 } from '@nestjs/common';
 import { ZodType } from 'zod';
 import { AnyZodObject } from 'zod/v3';
@@ -13,13 +14,11 @@ export class ZodValiditionPipe implements PipeTransform {
 
   // Método que vem do pipeTransform
   transform(value: any, metadata: ArgumentMetadata) {
-    try {
-      // Valida qualquer tipo de dado que vim do zod, com claro o tipo que eu mandei
-      const parsedValue = this.schema.safeParse(value);
-      return parsedValue.data;
-    } catch {
-      // Erro de bad request
-      throw new BadRequestException('Bad Request');
-    }
+     if (metadata.type !== 'body') return value;
+
+    const parsed = this.schema.safeParse(value);
+    if (!parsed.success) throw new BadRequestException('Bad Request');
+    
+    return parsed.data;
   }
 }

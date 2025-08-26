@@ -10,11 +10,13 @@ import { Inject, Injectable } from '@nestjs/common';
 export class UserGetUniqueUseCase {
   constructor(@Inject('IUserRepository') private userRepo: IUserRepository) {}
 
-  async execute(req: Request) {
-    const user: User = await checkAccess(req, this.userRepo.getById);
+  async execute(req: Request, id: string) {
+    const user: User = await checkAccess(req, this.userRepo.getById, id);
 
-    user.cpf = decryptCPF(user.cpf);
-    if (user.cnpj) user.cnpj = decryptCNPJ(user.cnpj);
+    if (id === 'me' && user.cpf && user.cnpj){
+      user.cpf = decryptCPF(user.cpf);
+      user.cnpj = decryptCNPJ(user.cnpj);
+    }
 
     return user;
   }

@@ -8,8 +8,8 @@ import { Inject, Injectable } from '@nestjs/common';
 export class UserDeleteUseCase {
   constructor(@Inject('IUserRepository') private userRepo: IUserRepository) {}
 
-  async execute(req: Request) {
-    const user: User = await checkAccess(req, this.userRepo.getById);
+  async execute(req: Request, id: string) {
+    const user: User = await checkAccess(req, this.userRepo.getById, id);
     await this.userRepo.delete(user.id);
   }
 }

@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Injectable,
+  Param,
   Post,
   Put,
   Req,
@@ -58,7 +59,7 @@ export class UserController {
     res.status(201).send({ Message: 'User Created', data: userCreated });
   }
 
-  @Put()
+  @Put(':id')
   @UsePipes(new ZodValiditionPipe(userSchemaUpdate))
   @ApiOperation({ summary: 'Update an existing user' })
   @ApiBody({ type: UpdateUserDTO, description: 'User data to update' })
@@ -67,34 +68,25 @@ export class UserController {
   @ApiResponse({ status: 400, description: 'Invalid data' })
   @ApiResponse({ status: 404, description: 'User not found' })
   async update(
+    @Param('id') id: string,
     @Body() data: userSchemaUpdateDTO,
     @Req() req: Request,
-    @Res() res: Response,
+
   ) {
-    await this.updateUseCase.execute(data, req);
-    res.status(200).send({ Message: 'User Updated' });
+    await this.updateUseCase.execute(data, req, id);
+    return { Message: 'User Updated' };
   }
 
-  @Delete()
+  @Delete(':id')
   @ApiOperation({ summary: 'Delete a user' })
   @ApiParam({ name: 'id', type: String, description: 'User id' })
   @ApiResponse({ status: 200, description: 'User deleted' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async remove(@Req() req: Request, @Res() res: Response) {
-    await this.deleteUseCase.execute(req);
+  async remove(@Req() req: Request, @Res() res: Response, @Param('id') id: string) {
+    await this.deleteUseCase.execute(req, id);
     res.status(200).send({ Message: 'User Deleted' });
   }
-
-  @Get('')
-  @ApiOperation({ summary: 'Get a user by ID' })
-  @ApiParam({ name: 'id', type: String, description: 'User id' })
-  @ApiResponse({ status: 200, description: 'User found', type: UserDTO })
-  @ApiResponse({ status: 404, description: 'User not found' })
-  async getUnique(@Req() req: Request, @Res() res: Response) {
-    const user = await this.getUniqueUseCase.execute(req);
-    res.status(200).send({ Message: 'User found', user });
-  }
-
+  
   @Get('/all')
   @UseGuards(PermissionGuard)
   @Permissions('MANAGE_USERS')
@@ -105,14 +97,24 @@ export class UserController {
     res.status(200).send({ Message: 'Users found', users: users });
   }
 
+  @Get(':id')
+  @ApiOperation({ summary: 'Get a user by ID' })
+  @ApiParam({ name: 'id', type: String, description: 'User id' })
+  @ApiResponse({ status: 200, description: 'User found', type: UserDTO })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async getUnique(@Req() req: Request, @Res() res: Response, @Param('id') id: string) {
+    const user = await this.getUniqueUseCase.execute(req, id);
+    res.status(200).send({ Message: 'User found', user });
+  }
+
   @Post('/login')
   @UsePipes(new ZodValiditionPipe(userSchemaLogin))
   @ApiOperation({ summary: 'Login a user' })
   @ApiBody({ type: Object, description: 'Login data (email/cpf/cnpj + password)' })
   @ApiResponse({ status: 200, description: 'Login successful', type: LoginUserDTO })
   @ApiResponse({ status: 400, description: 'Invalid credentials' })
-  async login(@Body() data: userSchemaLoginDTO, @Res() res: Response) {
-    const token = await this.loginUseCase.execute(data);
+  async login(@Req() req: Request, @Res() res: Response, @Body() data: userSchemaLoginDTO) {
+    const token = await this.loginUseCase.execute(data, req);
     res
       .cookie('token', token, {
         httpOnly: true,
