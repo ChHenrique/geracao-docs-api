@@ -1,4 +1,3 @@
-
 export class TemplateEntity {
     constructor(
        public name: string,
