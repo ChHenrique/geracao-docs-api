@@ -24,7 +24,6 @@ import { IRolePrismaRepository } from '../role/roleDomain/role.prisma.repository
     UserloginUseCase,
     UserGetAllUseCase,
     UserGetUniqueUseCase,
-
     // repositories
     {
       provide: 'IUserRepository',

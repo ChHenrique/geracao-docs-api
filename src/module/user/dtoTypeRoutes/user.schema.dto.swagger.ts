@@ -23,3 +23,15 @@ export class UserDTO {
   @ApiProperty({ example: 'ADMIN', description: 'Role of the user' })
   role: string;
 }
+
+
+export class UserResponseDTO {
+  @ApiProperty({ example: 'Pedro', description: 'First name of the user' })
+  name: string;
+
+  @ApiProperty({ example: 'Silva', description: 'Last name of the user' })
+  lastname: string;
+
+  @ApiProperty({ example: 'pedro.silva@email.com', description: 'User email' })
+  email: string;
+}
