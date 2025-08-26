@@ -1,13 +1,13 @@
 import { templateSchema, templateSchemaDTO } from "src/schemas/template.schema";
 import type { ITemplateRepository } from "../templateDomain/template.repository";
-import { BadRequestException, Injectable, } from "@nestjs/common";
+import { BadRequestException, Inject, Injectable, } from "@nestjs/common";
 import { TemplateEntity } from "../templateDomain/template.entities";
 import { Request } from "express";
 
 @Injectable()
 export class CreateTemplateUseCase {
     constructor(
-        private repo: ITemplateRepository
+         @Inject('ITemplateRepository') private repo: ITemplateRepository
     ) { }
 
     async execute(data: templateSchemaDTO, req: Request) {

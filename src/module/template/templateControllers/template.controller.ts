@@ -26,10 +26,11 @@ import { templateSchema, updateTemplateSchema } from 'src/schemas/template.schem
 import type { templateSchemaDTO, templateUpdateSchemaDTO } from 'src/schemas/template.schema';
 import type { Request, Response } from 'express';
 
-@ApiTags('Users')
+@ApiTags('Templates')
 @Injectable()
-@Controller('users')
-export class UserController {
+@Controller('templates')
+@UseGuards(PermissionGuard)
+export class TemplateController {
     constructor(
         private createUseCase: CreateTemplateUseCase,
         private updateUseCase: UpdateTemplateUseCase,
@@ -40,16 +41,15 @@ export class UserController {
     ) { }
 
     @Post()
-    @UseGuards(PermissionGuard)
-    @Permissions('MANAGE_USERS')
+    @Permissions('MANAGE_TEMPLATES')
     @UsePipes(new ZodValiditionPipe(templateSchema))
     async create(@Req() req: Request, @Body() data: templateSchemaDTO) {
         const templateCreated = await this.createUseCase.execute(data, req);
         return { message: 'Template Created', data: templateCreated };
     }
 
-
     @Put(':id')
+    @Permissions('MANAGE_TEMPLATES')
     @UsePipes(new ZodValiditionPipe(updateTemplateSchema))
     async update(
         @Param('id') id: string,
@@ -60,12 +60,14 @@ export class UserController {
         return { message: 'Template Updated' };
     }
 
+    @Permissions('MANAGE_TEMPLATES')
     @Delete(':id')
     async remove(@Param('id') id: string, @Res() res: Response) {
         await this.deleteUseCase.execute(id);
         res.status(200).send({ Message: 'Template Deleted' });
     }
 
+    
     @Get(':id')
     async getUnique(@Param('id') id: string, @Res() res: Response) {
         const template = await this.getUniqueUseCase.execute(id);
@@ -73,8 +75,6 @@ export class UserController {
     }
 
     @Get()
-    @UseGuards(PermissionGuard)
-    @Permissions('MANAGE_USERS')
     async getAll(@Res() res: Response) {
         const templates = await this.getAllUseCase.execute();
         res.status(200).send({ Message: 'Templates found', templates: templates });

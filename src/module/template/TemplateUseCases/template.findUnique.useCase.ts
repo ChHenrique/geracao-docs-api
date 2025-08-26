@@ -1,10 +1,10 @@
 import type { ITemplateRepository } from "../templateDomain/template.repository";
-import { BadRequestException, Injectable, NotFoundException, } from "@nestjs/common";
+import { BadRequestException, Inject, Injectable, NotFoundException, } from "@nestjs/common";
 
 @Injectable()
 export class GetUniqueTemplateUseCase {
     constructor(
-        private repo: ITemplateRepository
+        @Inject('ITemplateRepository') private repo: ITemplateRepository
     ) { }
 
     async execute(id: string) {
