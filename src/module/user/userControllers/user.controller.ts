@@ -92,7 +92,7 @@ export class UserController {
     res.status(200).send({ Message: 'User Deleted' });
   }
 
-  @Get('/all')
+  @Get()
   @UseGuards(PermissionGuard)
   @Permissions('MANAGE_USERS')
   @ApiOperation({ summary: 'Get all users' })

@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import type { IRoleRepository } from '../roleDomain/role.repository';
 
 @Injectable()
@@ -7,6 +7,8 @@ export class RoleGetUniqueUseCase {
 
   async execute(id: string) {
     const role = await this.roleRepo.getById(id);
+    if (!role) throw new NotFoundException("Role not found")
+
     return role;
   }
 }
