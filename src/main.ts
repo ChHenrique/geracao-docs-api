@@ -17,9 +17,9 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
 
   document.paths = {
-    ...document.paths, 
-    ...openApiComponents.paths
-  }
+    ...document.paths,
+    ...openApiComponents.paths,
+  };
   document.components = {
     ...document.components,
     ...openApiComponents,

@@ -30,7 +30,13 @@ import { UserDeleteUseCase } from '../userUseCases/user.delete.useCase';
 import { UserGetUniqueUseCase } from '../userUseCases/user.getUnique.useCase';
 import { UserGetAllUseCase } from '../userUseCases/user.getAll.useCase';
 import { UserloginUseCase } from '../userUseCases/user.login.useCase';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UserDTO } from '../dtoTypeRoutes/user.schema.dto.swagger';
 import { UpdateUserDTO } from '../dtoTypeRoutes/user.update.schema.dto.swagger';
 import { LoginUserDTO } from '../dtoTypeRoutes/user.login.dto.swagger';
@@ -46,7 +52,7 @@ export class UserController {
     private getUniqueUseCase: UserGetUniqueUseCase,
     private getAllUseCase: UserGetAllUseCase,
     private loginUseCase: UserloginUseCase,
-  ) { }
+  ) {}
 
   @Post()
   @UsePipes(new ZodValiditionPipe(userSchema))
@@ -63,7 +69,11 @@ export class UserController {
   @UsePipes(new ZodValiditionPipe(userSchemaUpdate))
   @ApiOperation({ summary: 'Update an existing user' })
   @ApiBody({ type: UpdateUserDTO, description: 'User data to update' })
-  @ApiResponse({ status: 200, description: 'User updated', type: UpdateUserDTO })
+  @ApiResponse({
+    status: 200,
+    description: 'User updated',
+    type: UpdateUserDTO,
+  })
   @ApiParam({ name: 'id', type: String, description: 'User id' })
   @ApiResponse({ status: 400, description: 'Invalid data' })
   @ApiResponse({ status: 404, description: 'User not found' })
@@ -71,7 +81,6 @@ export class UserController {
     @Param('id') id: string,
     @Body() data: userSchemaUpdateDTO,
     @Req() req: Request,
-
   ) {
     await this.updateUseCase.execute(data, req, id);
     return { Message: 'User Updated' };
@@ -82,11 +91,15 @@ export class UserController {
   @ApiParam({ name: 'id', type: String, description: 'User id' })
   @ApiResponse({ status: 200, description: 'User deleted' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async remove(@Req() req: Request, @Res() res: Response, @Param('id') id: string) {
+  async remove(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Param('id') id: string,
+  ) {
     await this.deleteUseCase.execute(req, id);
     res.status(200).send({ Message: 'User Deleted' });
   }
-  
+
   @Get('/all')
   @UseGuards(PermissionGuard)
   @Permissions('MANAGE_USERS')
@@ -102,7 +115,11 @@ export class UserController {
   @ApiParam({ name: 'id', type: String, description: 'User id' })
   @ApiResponse({ status: 200, description: 'User found', type: UserDTO })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async getUnique(@Req() req: Request, @Res() res: Response, @Param('id') id: string) {
+  async getUnique(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Param('id') id: string,
+  ) {
     const user = await this.getUniqueUseCase.execute(req, id);
     res.status(200).send({ Message: 'User found', user });
   }
@@ -110,10 +127,21 @@ export class UserController {
   @Post('/login')
   @UsePipes(new ZodValiditionPipe(userSchemaLogin))
   @ApiOperation({ summary: 'Login a user' })
-  @ApiBody({ type: Object, description: 'Login data (email/cpf/cnpj + password)' })
-  @ApiResponse({ status: 200, description: 'Login successful', type: LoginUserDTO })
+  @ApiBody({
+    type: Object,
+    description: 'Login data (email/cpf/cnpj + password)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Login successful',
+    type: LoginUserDTO,
+  })
   @ApiResponse({ status: 400, description: 'Invalid credentials' })
-  async login(@Req() req: Request, @Res() res: Response, @Body() data: userSchemaLoginDTO) {
+  async login(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Body() data: userSchemaLoginDTO,
+  ) {
     const token = await this.loginUseCase.execute(data, req);
     res
       .cookie('token', token, {

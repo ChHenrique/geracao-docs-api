@@ -14,11 +14,11 @@ export class ZodValiditionPipe implements PipeTransform {
 
   // Método que vem do pipeTransform
   transform(value: any, metadata: ArgumentMetadata) {
-     if (metadata.type !== 'body') return value;
+    if (metadata.type !== 'body') return value;
 
     const parsed = this.schema.safeParse(value);
     if (!parsed.success) throw new BadRequestException('Bad Request');
-    
+
     return parsed.data;
   }
 }

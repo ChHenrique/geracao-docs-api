@@ -1,4 +1,9 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import type { IUserRepository } from '../userDomain/user.repository';
 import { userSchemaDTO } from 'src/schemas/user.schema';
 import { isUnique } from 'src/utils/isUnique';
@@ -21,11 +26,11 @@ export class UserCreateUseCase {
     await isUnique(this.userRepo, data);
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
-    const isValidCpf = isValidCPF(data.cpf)
-    const isValidCnpj = isValidCNPJ(data.cnpj)
+    const isValidCpf = isValidCPF(data.cpf);
+    const isValidCnpj = isValidCNPJ(data.cnpj);
 
-    if (!isValidCpf) throw new BadRequestException("Invalid CPF")
-    if (!isValidCnpj) throw new BadRequestException("Invalid CNPJ")
+    if (!isValidCpf) throw new BadRequestException('Invalid CPF');
+    if (!isValidCnpj) throw new BadRequestException('Invalid CNPJ');
 
     const encryptedCPF = encryptCPF(data.cpf);
     const encryptedCNPJ = encryptCNPJ(data.cnpj);
@@ -45,6 +50,6 @@ export class UserCreateUseCase {
     await this.userRepo.create(user);
 
     const { password, cpf, cnpj, roleId, ...rest } = user;
-    return rest
+    return rest;
   }
 }

@@ -1,5 +1,5 @@
 export function isValidCPF(cpf: string): boolean {
-  cpf = cpf.replace(/\D/g, '')
+  cpf = cpf.replace(/\D/g, '');
 
   if (cpf.length !== 11) return false;
   if (/^(\d)\1+$/.test(cpf)) return false;

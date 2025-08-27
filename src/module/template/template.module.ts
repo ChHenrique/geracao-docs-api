@@ -8,26 +8,26 @@ import { DeleteTemplateUseCase } from './TemplateUseCases/template.delete.useCas
 import { TemplatePrismaRepository } from './templateDomain/template.prisma.repository';
 
 @Module({
-    controllers: [TemplateController],
-    providers: [
-        // use cases
-        CreateTemplateUseCase,
-        UpdateTemplateUseCase,
-        GetAllTemplateUseCase,
-        GetUniqueTemplateUseCase,
-        DeleteTemplateUseCase,
-        // repositories
-        {
-            provide: 'ITemplateRepository',
-            useClass: TemplatePrismaRepository,
-        }
-    ],
-    exports: [
-        CreateTemplateUseCase,
-        UpdateTemplateUseCase,
-        GetAllTemplateUseCase,
-        GetUniqueTemplateUseCase,
-        DeleteTemplateUseCase,
-    ],
+  controllers: [TemplateController],
+  providers: [
+    // use cases
+    CreateTemplateUseCase,
+    UpdateTemplateUseCase,
+    GetAllTemplateUseCase,
+    GetUniqueTemplateUseCase,
+    DeleteTemplateUseCase,
+    // repositories
+    {
+      provide: 'ITemplateRepository',
+      useClass: TemplatePrismaRepository,
+    },
+  ],
+  exports: [
+    CreateTemplateUseCase,
+    UpdateTemplateUseCase,
+    GetAllTemplateUseCase,
+    GetUniqueTemplateUseCase,
+    DeleteTemplateUseCase,
+  ],
 })
 export class TemplateModule {}

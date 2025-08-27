@@ -25,7 +25,13 @@ import {
 } from 'src/schemas/role.schema';
 import { ZodValiditionPipe } from 'src/pipes/zod.validation.pipe';
 import type { Response } from 'express';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { RoleSchema } from '../dtoTypesRoutes/role.schema.dto.swagger';
 import { UpdateRoleSchema } from '../dtoTypesRoutes/role.update.schema.dto.swagger';
 
@@ -44,9 +50,13 @@ export class RoleController {
 
   @Post()
   @UsePipes(new ZodValiditionPipe(roleSchema))
-  @ApiOperation({summary: "Create role"})
-  @ApiBody({type: RoleSchema, description: 'Role data to create' })
-  @ApiResponse({ status: 201, description: 'Role created successfully', type: RoleSchema })
+  @ApiOperation({ summary: 'Create role' })
+  @ApiBody({ type: RoleSchema, description: 'Role data to create' })
+  @ApiResponse({
+    status: 201,
+    description: 'Role created successfully',
+    type: RoleSchema,
+  })
   async create(@Body() data: roleSchemaDTO, @Res() res: Response) {
     const roleCreated = await this.createUseCase.execute(data);
     res
@@ -57,8 +67,16 @@ export class RoleController {
   @Put(':id')
   @UsePipes(new ZodValiditionPipe(roleSchemaUpdate))
   @ApiParam({ name: 'id', description: 'Role ID' })
-  @ApiBody({type: UpdateRoleSchema, description: 'Information that is updated, all are optional, you can update only 1 and keep the others'})
-  @ApiResponse({ status: 200, description: 'Role updated successfully', type: RoleSchema })
+  @ApiBody({
+    type: UpdateRoleSchema,
+    description:
+      'Information that is updated, all are optional, you can update only 1 and keep the others',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Role updated successfully',
+    type: RoleSchema,
+  })
   async update(
     @Body() data: roleSchemaUpdateDTO,
     @Res() res: Response,
@@ -80,7 +98,7 @@ export class RoleController {
 
   @Get(':id')
   @ApiParam({ name: 'id', description: 'Role ID' })
-  @ApiResponse({ status: 200, description: 'Role found', type: RoleSchema})
+  @ApiResponse({ status: 200, description: 'Role found', type: RoleSchema })
   async getUnique(@Res() res: Response, @Param('id') id: string) {
     const role = await this.getUniqueUseCase.execute(id);
     res.status(200).send({ Message: 'Role found', role: role });

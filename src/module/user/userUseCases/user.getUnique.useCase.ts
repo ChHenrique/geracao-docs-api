@@ -13,7 +13,7 @@ export class UserGetUniqueUseCase {
   async execute(req: Request, id: string) {
     const user: User = await checkAccess(req, this.userRepo.getById, id);
 
-    if (id === 'me' && user.cpf && user.cnpj){
+    if (id === 'me' && user.cpf && user.cnpj) {
       user.cpf = decryptCPF(user.cpf);
       user.cnpj = decryptCNPJ(user.cnpj);
     }

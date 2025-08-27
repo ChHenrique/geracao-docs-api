@@ -25,7 +25,7 @@ export class PermissionGuard implements CanActivate {
     // req.user
     const req = context.switchToHttp().getRequest();
     const user: IUserJWT = req.user;
-    console.log("USER:", user)
+    console.log('USER:', user);
     // Verifica se a permissão existe
     return requiredPermissions.some((perm: permissionType) =>
       user?.permissions.includes(perm),

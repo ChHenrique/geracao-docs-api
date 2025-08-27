@@ -11,19 +11,19 @@ export class UserPrismaRepository implements IUserRepository {
   }
 
   async update(id: string, data: UserEntitie): Promise<UserEntitie | null> {
-     const { name, lastname, email, cpf, cnpj, password, roleId } = data;
+    const { name, lastname, email, cpf, cnpj, password, roleId } = data;
 
     const updatedUser = await prisma.user.update({
       where: { id },
-      data:  {
-      name,
-      lastname,
-      email,
-      cpf,
-      cnpj,
-      password,
-      ...(roleId && { roleId }), 
-    },
+      data: {
+        name,
+        lastname,
+        email,
+        cpf,
+        cnpj,
+        password,
+        ...(roleId && { roleId }),
+      },
     });
     return updatedUser;
   }
@@ -40,7 +40,7 @@ export class UserPrismaRepository implements IUserRepository {
       include: {
         role: {
           include: {
-            permissions: { include: { permission: true }},
+            permissions: { include: { permission: true } },
           },
         },
         AuditLog: true,
@@ -48,11 +48,10 @@ export class UserPrismaRepository implements IUserRepository {
       },
     });
 
-
     return user;
   }
 
-  async getAll(){
+  async getAll() {
     const users = await prisma.user.findMany({
       include: {
         role: true,
@@ -69,8 +68,8 @@ export class UserPrismaRepository implements IUserRepository {
       include: {
         role: {
           include: {
-            permissions: { include: { permission: true }}
-          }
+            permissions: { include: { permission: true } },
+          },
         },
         AuditLog: true,
         templates: true,
@@ -85,8 +84,8 @@ export class UserPrismaRepository implements IUserRepository {
       include: {
         role: {
           include: {
-            permissions: { include: { permission: true } }
-          }
+            permissions: { include: { permission: true } },
+          },
         },
         AuditLog: true,
         templates: true,
@@ -99,10 +98,10 @@ export class UserPrismaRepository implements IUserRepository {
     const user = await prisma.user.findUnique({
       where: { cnpj },
       include: {
-         role: {
+        role: {
           include: {
-            permissions: { include: { permission: true } }
-          }
+            permissions: { include: { permission: true } },
+          },
         },
         AuditLog: true,
         templates: true,

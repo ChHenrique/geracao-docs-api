@@ -14,7 +14,7 @@ export class UserUpdateUseCase {
   constructor(
     @Inject('IUserRepository') private userRepo: IUserRepository,
     @Inject('IRoleRepository') private roleRepo: IRoleRepository,
-  ) { }
+  ) {}
 
   async execute(data: userSchemaUpdateDTO, req: Request, id: string) {
     const user: User = await checkAccess(req, this.userRepo.getById, id);
@@ -33,6 +33,6 @@ export class UserUpdateUseCase {
     await encryptUserData(data, userExist);
     await this.userRepo.update(user.id, userExist);
 
-    return
+    return;
   }
 }

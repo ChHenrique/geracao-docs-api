@@ -17,7 +17,10 @@ export class UserDTO {
   @ApiProperty({ example: '12345678901', description: 'CPF with 11 digits' })
   cpf: string;
 
-  @ApiProperty({ example: '12345678000199', description: 'CNPJ with 14 digits' })
+  @ApiProperty({
+    example: '12345678000199',
+    description: 'CNPJ with 14 digits',
+  })
   cnpj: string;
 
   @ApiProperty({ example: 'ADMIN', description: 'Role of the user' })
