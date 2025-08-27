@@ -9,6 +9,7 @@ import {
   Put,
   Req,
   Res,
+  UnauthorizedException,
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
@@ -34,6 +35,9 @@ import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/s
 import { UserDTO } from '../dtoTypeRoutes/user.schema.dto.swagger';
 import { UpdateUserDTO } from '../dtoTypeRoutes/user.update.schema.dto.swagger';
 import { LoginUserDTO } from '../dtoTypeRoutes/user.login.dto.swagger';
+import jwt from 'jsonwebtoken'
+import { UserAutologinUseCase } from '../userUseCases/user.autoLogin.useCase';
+import { UserGetAllResponseDTO } from '../dtoTypeRoutes/user.get.dto.swagger';
 
 @ApiTags('Users')
 @Injectable()
@@ -46,6 +50,7 @@ export class UserController {
     private getUniqueUseCase: UserGetUniqueUseCase,
     private getAllUseCase: UserGetAllUseCase,
     private loginUseCase: UserloginUseCase,
+   // private autoLoginUseCase: UserAutologinUseCase,
   ) { }
 
   @Post()
@@ -86,12 +91,12 @@ export class UserController {
     await this.deleteUseCase.execute(req, id);
     res.status(200).send({ Message: 'User Deleted' });
   }
-  
-  @Get('/all')
+
+  @Get()
   @UseGuards(PermissionGuard)
   @Permissions('MANAGE_USERS')
   @ApiOperation({ summary: 'Get all users' })
-  @ApiResponse({ status: 200, description: 'List of users', type: UserDTO })
+  @ApiResponse({ status: 200, description: 'List of users', type: UserGetAllResponseDTO })
   async getAll(@Res() res: Response) {
     const users = await this.getAllUseCase.execute();
     res.status(200).send({ Message: 'Users found', users: users });
@@ -107,11 +112,23 @@ export class UserController {
     res.status(200).send({ Message: 'User found', user });
   }
 
+/*     @Post('/auto-login')
+  async autoLogin(@Req() req: Request, @Res() res: Response) {
+    const token = await this.autoLoginUseCase.execute(req)
+    res
+      .cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+      })
+      .send({ Message: 'login successful'});
+  } */
+
   @Post('/login')
   @UsePipes(new ZodValiditionPipe(userSchemaLogin))
   @ApiOperation({ summary: 'Login a user' })
   @ApiBody({ type: Object, description: 'Login data (email/cpf/cnpj + password)' })
-  @ApiResponse({ status: 200, description: 'Login successful', type: LoginUserDTO })
+  @ApiResponse({ status: 200, description: 'Login successful' })
   @ApiResponse({ status: 400, description: 'Invalid credentials' })
   async login(@Req() req: Request, @Res() res: Response, @Body() data: userSchemaLoginDTO) {
     const token = await this.loginUseCase.execute(data, req);
@@ -123,4 +140,5 @@ export class UserController {
       })
       .send({ Message: 'Login successful' });
   }
+
 }

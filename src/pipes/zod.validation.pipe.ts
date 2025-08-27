@@ -17,6 +17,7 @@ export class ZodValiditionPipe implements PipeTransform {
      if (metadata.type !== 'body') return value;
 
     const parsed = this.schema.safeParse(value);
+    console.log("parsedData: ", parsed.error)
     if (!parsed.success) throw new BadRequestException('Bad Request');
     
     return parsed.data;

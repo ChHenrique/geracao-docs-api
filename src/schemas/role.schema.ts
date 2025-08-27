@@ -24,7 +24,7 @@ export const roleSchema = z.object({
 
 export const roleSchemaUpdate = z.object({
   name: z.string().min(1).max(255).optional(),
-  permissions: z.array(permissionsEnum)
+  permissions: z.array(permissionsEnum).optional()
 }).openapi("Role schema Update");
 
 

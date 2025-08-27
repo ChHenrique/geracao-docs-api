@@ -5,6 +5,7 @@ import { insensitiveUserData } from 'src/interfaces/insensitive.userData';
 import { RoleEntitie } from './role.entitie';
 import { permissionType } from 'src/types/permissions.type';
 import { RoleWithPermissions } from 'src/types/roleWithPermissions';
+import { NotFoundException } from '@nestjs/common';
 
 export class IRolePrismaRepository implements IRoleRepository {
   async create(data: RoleEntitie): Promise<Role | null> {
@@ -26,37 +27,36 @@ export class IRolePrismaRepository implements IRoleRepository {
   }
 
   async update(id: string, data: RoleEntitie, role: any): Promise<Role | null> {
-    const currentPermissions = role.permissions.map((rp) => rp.permission.name);
+    const rolePermissions = await prisma.role.findUnique({
+      where: { id },
+      include: { permissions: { include: { permission: true } } }
+    })
+    if (!rolePermissions) throw new NotFoundException("Role not found")
 
-    const toAdd = data.permissions.filter(
-      (p) => !currentPermissions.includes(p),
-    );
-    const toRemove = currentPermissions.filter(
-      (p) => !data.permissions.includes(p),
-    );
+    const currentPermissions = rolePermissions.permissions.map(rp => rp.permission.name)
 
-    const permissionsToRemove = await prisma.permission.findMany({
-      where: { name: { in: toRemove } },
-      select: { id: true },
-    });
+    const toRemove = data.permissions.filter(pr => currentPermissions.includes(pr))
+    const toAdd = data.permissions.filter(pr => !currentPermissions.includes(pr))
+
+    const permissionToRemove = await prisma.permission.findMany({
+      where: { name: { in: toRemove }},
+      select: { id: true }
+    })
 
     const updatedRole = await prisma.role.update({
       where: { id },
       data: {
-        name: data.name,
         permissions: {
           deleteMany: {
-            permissionId: { in: permissionsToRemove.map((p) => p.id) },
+            permissionId: { in: permissionToRemove.map(p => p.id)}
           },
-          create: toAdd.map((permName) => ({
-            permission: { connect: { name: permName } },
-          })),
-        },
-      },
-      include: { permissions: { include: { permission: true } } },
-    });
 
-    return updatedRole;
+          create: toAdd.map(permName => ({ permission: { connect: { name: permName }}}))
+        }
+      },
+    })
+
+    return updatedRole
   }
 
   async delete(id: string): Promise<void> {
@@ -100,10 +100,7 @@ export class IRolePrismaRepository implements IRoleRepository {
   async getAll(): Promise<Role[] | null> {
     const roles = await prisma.role.findMany({
       include: {
-        users: {
-          select: insensitiveUserData,
-        },
-        permissions: true,
+        permissions: { include: { permission: true }},
       },
     });
 
@@ -116,3 +113,4 @@ export class IRolePrismaRepository implements IRoleRepository {
     });
   }
 }
+

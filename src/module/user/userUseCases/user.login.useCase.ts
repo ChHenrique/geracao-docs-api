@@ -28,12 +28,6 @@ export class UserloginUseCase {
   async execute(data: userSchemaLoginDTO, req: Request) {
     let user: any;
 
-    if (req.user) {
-      user = await this.userRepo.getById(req.user.id)
-      if (!user) throw new NotFoundException('User not found')
-      return this.tokenGenerate(user)
-    }
-
     if (data.cpf) {
       const encryptedCPF = encryptCPF(data.cpf)
       user = await this.userRepo.getByCPF(encryptedCPF)
